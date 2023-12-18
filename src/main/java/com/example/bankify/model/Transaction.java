@@ -1,5 +1,5 @@
 /**
- * Class: Role
+ * Class: Transaction
  * <p>
  * Description: This class serves as...
  * <p>
@@ -7,15 +7,16 @@
  */
 package com.example.bankify.model;
 
-import com.example.bankify.enums.ERole;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
@@ -23,17 +24,21 @@ import lombok.experimental.FieldDefaults;
 @Entity
 @Getter
 @Setter
-@Table(name = "roles")
+@Table(name = "transactions")
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-public class Role {
+public class Transaction {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   Long id;
 
-  @Enumerated(EnumType.STRING)
-  @Column(length = 20)
-  ERole name;
+  BigDecimal amount;
+  LocalDateTime timestamp;
+  String type; // e.g., DEPOSIT, WITHDRAW
+  String description;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "account_id")
+  Account account;
 
 }
-
