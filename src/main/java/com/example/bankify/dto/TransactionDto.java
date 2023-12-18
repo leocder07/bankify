@@ -16,7 +16,10 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class TransactionDto {
+  Long transactionId;
   Long fromAccountId;
   Long toAccountId;
   BigDecimal amount;
+  String description;
+  String timestamp;
 }

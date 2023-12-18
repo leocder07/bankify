@@ -38,7 +38,11 @@ public class Transaction {
   String description;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "account_id")
-  Account account;
+  @JoinColumn(name = "from_account_id")
+  Account fromAccount;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "to_account_id")
+  Account toAccount;
 
 }

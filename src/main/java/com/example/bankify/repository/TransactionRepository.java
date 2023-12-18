@@ -15,6 +15,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
-  List<Transaction> findByAccountId(Long accountId);
-  List<Transaction> findByAccountIdAndTimestampBetween(Long accountId, LocalDateTime start, LocalDateTime end);
+  List<Transaction> findByFromAccountId(Long accountId);
+  List<Transaction> findByFromAccountIdAndTimestampBetween(Long accountId, LocalDateTime start, LocalDateTime end);
 }

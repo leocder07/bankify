@@ -51,7 +51,8 @@ public enum ErrorCode {
   DEVICE_NOT_FOUND("E025", "Device not found", HttpStatus.NOT_FOUND, "The specified device does not exist."),
   RATE_LIMIT_EXCEEDED("E026", "Rate limit exceeded", HttpStatus.TOO_MANY_REQUESTS, "You have exceeded the rate limit."),
   SERVICE_UNAVAILABLE("E027", "Service unavailable", HttpStatus.SERVICE_UNAVAILABLE, "The requested service is unavailable."),
-  AUTHORIZATION_FAILED("E028", "Authorization failed", HttpStatus.UNAUTHORIZED, "The request is not authorized."),;
+  AUTHORIZATION_FAILED("E028", "Authorization failed", HttpStatus.UNAUTHORIZED, "The request is not authorized."),
+  INSUFFICIENT_BALANCE("E029", "Insufficient balance", HttpStatus.BAD_REQUEST, "The account does not have sufficient balance to make the transfer."),;
 
   String code;
   String message;

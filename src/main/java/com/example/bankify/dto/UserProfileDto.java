@@ -1,5 +1,5 @@
 /**
- * Class: UserDto
+ * Class: UserProfileDto
  * <p>
  * Description: This class serves as...
  * <p>
@@ -8,7 +8,6 @@
 package com.example.bankify.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
@@ -17,9 +16,9 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @AllArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-public class UserDto {
-  String email;
-  String password;
+public class UserProfileDto {
+  Long userId;
+  String username;
   String fullName;
   String address;
   String phoneNumber;

@@ -7,17 +7,10 @@
  */
 package com.example.bankify.security;
 
-import com.example.bankify.api.errors.ErrorCode;
-import com.example.bankify.api.exceptions.CustomException;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import jakarta.annotation.PostConstruct;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,52 +18,49 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
+import java.util.Date;
+
 @Component
 public class JwtTokenProvider {
 
-  @Value("${security.jwt.token.secret-key:secret-key}")
-  private String secretKey;
-
-  @Value("${security.jwt.token.expire-length:3600000}")
-  private long validityInMilliseconds = 3600000; // 1h
-
+  private final SecretKey key;
   private final UserDetailsService userDetailsService;
 
-  public JwtTokenProvider(UserDetailsService userDetailsService) {
+  public JwtTokenProvider(@Value("${security.jwt.secret}") String secret, UserDetailsService userDetailsService) {
+    this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     this.userDetailsService = userDetailsService;
   }
 
-  @PostConstruct
-  protected void init() {
-    secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
-  }
-
-  public String createToken(String username, List<String> roles) {
+  public String createToken(String username) {
     Claims claims = Jwts.claims().setSubject(username);
-    claims.put("roles", roles);
-
     Date now = new Date();
-    Date validity = new Date(now.getTime() + validityInMilliseconds);
+    Date validity = new Date(now.getTime() + 3600000); // 1 hour for example
 
     return Jwts.builder()
         .setClaims(claims)
         .setIssuedAt(now)
         .setExpiration(validity)
-        .signWith(SignatureAlgorithm.HS256, secretKey)
+        .signWith(key, SignatureAlgorithm.HS256)
         .compact();
   }
 
   public Authentication getAuthentication(String token) {
-    UserDetails userDetails = this.userDetailsService.loadUserByUsername(getUsername(token));
+    UserDetails userDetails = this.userDetailsService.loadUserByUsername(getUsernameFromToken(token));
     return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
   }
 
-  public String getUsername(String token) {
-    return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+  public String getUsernameFromToken(String token) {
+    return Jwts.parserBuilder()
+        .setSigningKey(key)
+        .build()
+        .parseClaimsJws(token)
+        .getBody()
+        .getSubject();
   }
 
-  public String resolveToken(HttpServletRequest req) {
-    String bearerToken = req.getHeader("Authorization");
+  public String resolveToken(HttpServletRequest request) {
+    String bearerToken = request.getHeader("Authorization");
     if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
       return bearerToken.substring(7);
     }
@@ -79,10 +69,13 @@ public class JwtTokenProvider {
 
   public boolean validateToken(String token) {
     try {
-      Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+      Jwts.parserBuilder()
+          .setSigningKey(key)
+          .build()
+          .parseClaimsJws(token);
       return true;
     } catch (JwtException | IllegalArgumentException e) {
-      throw new CustomException(ErrorCode.AUTHORIZATION_FAILED);
+      throw new IllegalStateException("Invalid JWT token");
     }
   }
 }

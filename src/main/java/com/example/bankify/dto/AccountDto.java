@@ -17,6 +17,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class AccountDto {
   Long userId;
+  Long accountId;
   String accountNumber;
   BigDecimal initialBalance;
   String accountType;

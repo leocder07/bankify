@@ -38,7 +38,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         .password(user.getPassword())
         .authorities(user.getRoles().stream()
             .map(role -> new SimpleGrantedAuthority(role.getName().name()))
-            .collect(Collectors.toList()))
+            .toList())
         .accountExpired(false)
         .accountLocked(false)
         .credentialsExpired(false)

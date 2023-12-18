@@ -8,6 +8,7 @@
 package com.example.bankify.model;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -35,6 +36,7 @@ public class Account {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   Long id;
 
+  @Column(name = "account_number", unique = true)
   String accountNumber;
   BigDecimal balance;
   String accountType; // e.g., SAVINGS, CHECKING
@@ -44,7 +46,10 @@ public class Account {
   @JoinColumn(name = "user_id")
   User user;
 
-  @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
-  Set<Transaction> transactions = new HashSet<>();
+  @OneToMany(mappedBy = "fromAccount", cascade = CascadeType.ALL, orphanRemoval = true)
+  Set<Transaction> outgoingTransactions = new HashSet<>();
+
+  @OneToMany(mappedBy = "toAccount", cascade = CascadeType.ALL, orphanRemoval = true)
+  Set<Transaction> incomingTransactions = new HashSet<>();
 
 }
